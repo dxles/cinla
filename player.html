@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nowtify Player</title>
+  <link rel="stylesheet" href="player.css">
+  <!-- GSAP Animasyon Kütüphanesi -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+  <!-- Arka plan artık bulanık kapak resmi değil, aşağıdaki #ytPlayerHost
+       (bulanık video). bg-overlay üstüne kararma bindirir. -->
+  <div class="bg-overlay"></div>
+
+  <!-- Geri Dönüş Butonu -->
+  <a href="index.html" class="back-link" id="backLink">← Geri Dön</a>
+
+  <!-- Ana Sahne -->
+  <div class="stage" id="stage">
+    <div class="now-row">
+      <div class="cover-wrap" id="coverWrap">
+        <img src="" alt="Kapak" class="cover" id="coverImg">
+      </div>
+      <div class="track-meta">
+        <div class="track-title" id="trackTitle">Şarkı Yükleniyor...</div>
+        <div class="track-channel" id="trackChannel">Sanatçı</div>
+        <div class="player-status" id="playerStatus"></div>
+        <div class="progress-area">
+          <input type="range" id="seekBar" value="0" min="0" max="100">
+          <div class="time-row">
+            <span id="curTime">0:00</span>
+            <span id="durTime">0:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equalizer -->
+  <div class="equalizer-container" id="equalizer">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- Şarkı Sözleri (Sağ Kayan Alan) -->
+  <div class="lyrics-container" id="lyricsContainerOuter">
+    <div class="lyrics-status" id="lyricsStatus">Sözler yükleniyor...</div>
+    <div id="lyricsContent"></div>
+  </div>
+
+  <!-- YouTube Video Alanı: video her zaman burada, arka planda, tüm
+       ekranı kaplayacak şekilde ve bulanık (blur) olarak oynar.
+       pointer-events: none olduğu için üzerine tıklanamaz — tıklama
+       videoyu durdurup/oynatıp kontrol edemez. -->
+  <div id="ytPlayerHost"></div>
+  <div class="video-block-overlay" id="videoBlockOverlay"></div>
+
+  <!-- Çalma Sırası Butonu: equalizer'ın hemen altında. -->
+  <div class="action-row">
+    <button id="queueToggleBtn" class="corner-btn" title="Çalma sırası">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M17 9v9.5a2.5 2.5 0 1 1-1.5-2.29"/><path d="M17 9l3-2v9"/></svg>
+      <span>Sıra</span>
+    </button>
+  </div>
+
+  <!-- Çalma Sırası Paneli -->
+  <div class="queue-panel" id="queuePanel">
+    <div class="queue-panel-head">
+      <h3>Çalma Sırası</h3>
+      <button id="queueCloseBtn" class="queue-close-btn" title="Kapat">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="queue-list" id="queueList"></div>
+  </div>
+
+  <!-- Alt Kontrol Barı -->
+  <div class="controls">
+    <button class="ctrl-btn toggle-btn" id="shuffleBtn" title="Karıştır">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h3.5c1.5 0 2.5.6 3.5 2l5 8c1 1.4 2 2 3.5 2H21"/>
+        <path d="M16 4l5 4-5 4"/>
+        <path d="M3 18h3.5c1.5 0 2.5-.6 3.5-2l1-1.6"/>
+        <path d="M16 20l5-4-5-4"/>
+      </svg>
+    </button>
+    <button class="ctrl-btn" id="backBtn" title="10 Saniye Geri">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
+    </button>
+    <button class="ctrl-btn play-btn" id="playBtn" title="Oynat/Durdur">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="ctrl-btn" id="fwdBtn" title="10 Saniye İleri">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 6v12l8.5-6L13 6zm-.5 6l-8.5-6v12l8.5-6z"/></svg>
+    </button>
+    <button class="ctrl-btn toggle-btn" id="repeatBtn" title="Tekrarla">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7a4 4 0 0 1 4-4h9"/>
+        <path d="M17 3l3 3-3 3"/>
+        <path d="M20 17a4 4 0 0 1-4 4H7"/>
+        <path d="M7 21l-3-3 3-3"/>
+      </svg>
+    </button>
+
+    <div class="ctrl-sep"></div>
+
+    <button class="ctrl-btn" id="muteBtn" title="Sessiz">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </svg>
+    </button>
+    <input type="range" id="volumeSlider" min="0" max="100" value="100">
+  </div>
+
+  <!-- Ortak depolama/yardımcı fonksiyonlar -->
+  <script src="common.js"></script>
+  <!-- YouTube Player Yükleyici Scripti -->
+  <script src="youtube-player.js"></script>
+  <!-- Ana JavaScript Dosyamız -->
+  <script src="player.js"></script>
+</body>
+</html>

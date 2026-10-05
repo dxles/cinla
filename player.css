@@ -1,0 +1,599 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --spotify-green: #1DB954;
+    --dark-bg: #0a0a0a;
+    --dark-card: #181818;
+    --dark-hover: #282828;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B3B3B3;
+    --danger: #E22134;
+    --radius: 10px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    overflow: hidden;
+    position: relative;
+    cursor: default;
+    transition: cursor 0.2s ease;
+}
+
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+
+/* ================= Arka plan ================= */
+.bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.75) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ================= Geri dön ================= */
+.back-link {
+    position: fixed;
+    top: 22px;
+    left: 26px;
+    z-index: 50;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    padding: 9px 16px;
+    border-radius: 50px;
+    transition: opacity 0.4s ease, transform 0.3s ease, background 0.2s ease;
+}
+
+.back-link:hover {
+    background: rgba(255,255,255,0.16);
+    opacity: 1 !important;
+}
+
+/* ================= Sahne ================= */
+.stage {
+    position: relative;
+    z-index: 5;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 320px 0 60px;
+    transition: opacity 0.35s ease;
+}
+
+.now-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    max-width: 720px;
+    width: 100%;
+}
+
+.cover-wrap {
+    flex-shrink: 0;
+    width: 280px;
+    height: 280px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+    background: #000;
+}
+
+.cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.track-meta {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.track-title {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.track-channel {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.player-status {
+    font-size: 13px;
+    color: var(--spotify-green);
+    min-height: 16px;
+}
+
+.adblock-hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+    max-width: 420px;
+    line-height: 1.5;
+}
+
+.adblock-hint a {
+    color: var(--spotify-green);
+    text-decoration: underline;
+}
+
+/* İlerleme çubuğu */
+.progress-area {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.progress-area input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+    cursor: pointer;
+}
+
+.progress-area input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 0 rgba(29,185,84,0.3);
+    transition: box-shadow 0.15s ease;
+}
+
+.progress-area input[type="range"]:hover::-webkit-slider-thumb {
+    box-shadow: 0 0 0 8px rgba(29,185,84,0.2);
+}
+
+.progress-area input[type="range"]::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+}
+
+.time-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ================= Eşitleyici ================= */
+.equalizer-container {
+    position: fixed;
+    left: 60px;
+    bottom: 110px;
+    z-index: 4;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 34px;
+    opacity: 0.35;
+    transition: opacity 0.4s ease;
+}
+
+.equalizer-container.playing {
+    opacity: 1;
+}
+
+.equalizer-container span {
+    display: block;
+    width: 4px;
+    height: 6px;
+    background: var(--spotify-green);
+    border-radius: 2px;
+    transform-origin: bottom center;
+}
+
+/* ================= Şarkı sözleri ================= */
+.lyrics-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    width: 380px;
+    max-width: 40vw;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    text-align: right;
+    transition: opacity 0.35s ease;
+}
+
+.lyrics-status {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.lyrics-status.hidden { display: none; }
+
+#lyricsContent {
+    width: 100%;
+}
+
+/* Senkron mod (varsayılan/Spotify tarzı): tek satır, büyük, ortada,
+   satır değiştikçe JS içinde GSAP ile kayarak/solarak güncellenir. */
+.lyrics-current-line {
+    font-size: clamp(22px, 2.6vw, 36px);
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--text-primary);
+    min-height: 1.3em;
+    letter-spacing: -0.01em;
+    will-change: transform, opacity;
+}
+
+/* Düz (senkronsuz) sözler: zaman bilgisi olmadığı için tek satır
+   halinde gösterilemiyor, akan/kaydırılabilir küçük bir liste olarak
+   kalır. */
+.lyrics-container.lyrics-plain-mode {
+    padding: 90px 34px 140px;
+    overflow-y: auto;
+    mask-image: linear-gradient(to bottom, transparent 0, black 90px, black calc(100% - 120px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 90px, black calc(100% - 120px), transparent 100%);
+}
+
+.lyrics-container.lyrics-plain-mode::-webkit-scrollbar { width: 0; }
+
+.lyrics-container.lyrics-plain-mode #lyricsContent p {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.55);
+}
+
+.lyrics-container.lyrics-plain-mode #lyricsContent p:empty::before {
+    content: "";
+    display: block;
+    height: 6px;
+}
+
+/* ================= Arka plan videosu =================
+   Video artık ayrı bir "video modu"na geçmeden, her zaman burada
+   arka planda oynar: tam ekranı kaplar ve bulanıklaştırılır, tıpkı
+   eskiden statik kapak resminin bulanık hâlinin durduğu yerde.
+   pointer-events: none olduğu için iframe'e hiçbir tıklama/dokunma/
+   tekerlek olayı ulaşmaz — video kazara durdurulamaz, oynatılamaz,
+   ileri/geri alınamaz ya da tam ekrana geçemez. Üstündeki
+   .video-block-overlay (görünmez, pointer-events: auto) olayları
+   tamamen yutarak ekstra bir güvenlik katmanı sağlar. Tüm kontrol
+   sadece alttaki .controls barından yapılır. */
+#ytPlayerHost {
+    position: fixed;
+    inset: -60px;
+    width: calc(100% + 120px);
+    height: calc(100% + 120px);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(0.5px) brightness(1.0) saturate(1.3);
+    transform: scale(1.1);
+    background: #000;
+}
+
+#ytPlayerHost iframe {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border: 0;
+}
+
+.video-block-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: transparent;
+    pointer-events: auto;
+}
+
+/* ================= Köşe butonları ================= */
+.corner-btn {
+    position: fixed;
+    top: 22px;
+    right: 26px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    border: none;
+    color: var(--text-primary);
+    padding: 9px 16px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.2s ease, opacity 0.4s ease, transform 0.3s ease;
+}
+
+.corner-btn:hover { background: rgba(255,255,255,0.16); }
+
+/* Sıra butonu: equalizer'ın hemen altında */
+.action-row {
+    position: fixed;
+    left: 60px;
+    bottom: 58px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.4s ease, transform 0.3s ease;
+}
+
+.action-row .corner-btn {
+    position: static;
+    top: auto;
+    right: auto;
+}
+
+/* ================= Çalma sırası paneli ================= */
+.queue-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    background: rgba(18,18,18,0.97);
+    backdrop-filter: blur(14px);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    box-shadow: -12px 0 40px rgba(0,0,0,0.5);
+    transform: translateX(100%);
+    transition: transform 0.32s ease;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+}
+
+.queue-panel.open { transform: translateX(0); }
+
+.queue-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.queue-panel-head h3 {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.queue-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+}
+
+.queue-close-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); }
+
+.queue-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.queue-empty {
+    color: var(--text-secondary);
+    font-size: 13px;
+    padding: 20px 10px;
+    text-align: center;
+}
+
+.queue-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.queue-item:hover { background: rgba(255,255,255,0.06); }
+
+.queue-item.active {
+    background: rgba(29,185,84,0.14);
+}
+
+.queue-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #000;
+}
+
+.queue-item-info { min-width: 0; flex: 1; }
+
+.queue-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.queue-item.active .queue-item-title { color: var(--spotify-green); }
+
+.queue-item-channel {
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.queue-now-badge {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--spotify-green);
+    background: rgba(29,185,84,0.16);
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+/* ================= Alt kontrol barı ================= */
+.controls {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(24,24,24,0.85);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 16px;
+    border-radius: 50px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+    transition: opacity 0.4s ease, transform 0.35s ease;
+}
+
+.ctrl-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.ctrl-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.ctrl-btn.play-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--text-primary);
+    color: #000;
+}
+
+.ctrl-btn.play-btn:hover {
+    background: var(--spotify-green);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.ctrl-btn.toggle-btn.active {
+    color: var(--spotify-green);
+}
+
+.ctrl-sep {
+    width: 1px;
+    height: 22px;
+    background: rgba(255,255,255,0.12);
+    margin: 0 2px;
+}
+
+#volumeSlider {
+    -webkit-appearance: none;
+    width: 80px;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+    cursor: pointer;
+}
+
+#volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+#volumeSlider::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+}
+
+/* ================= HUD otomatik gizleme =================
+   Fare/dokunma birkaç saniye hareketsiz kalırsa kontrol arayüzü
+   (geri dön, video/sıra köşe butonları, alt kontrol barı) otomatik
+   solar. Bu, "Videoyu Göster" butonundan bağımsız çalışır ve ayrı
+   bir buton olarak gösterilmez. */
+body.hud-hidden { cursor: none; }
+
+body.hud-hidden .back-link,
+body.hud-hidden .corner-btn,
+body.hud-hidden .controls {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+}
+
+body.hud-hidden .controls {
+    transform: translateX(-50%) translateY(10px);
+}
+
+/* ================= Duyarlılık ================= */
+@media (max-width: 900px) {
+    .stage { padding: 0 24px; }
+    .lyrics-container { display: none; }
+    .now-row { flex-direction: column; text-align: center; gap: 20px; }
+    .cover-wrap { width: 220px; height: 220px; }
+    .equalizer-container { left: 24px; bottom: 96px; }
+}
+
+@media (max-width: 560px) {
+    .controls { gap: 4px; padding: 8px 10px; }
+    #volumeSlider { width: 50px; }
+    .queue-panel { width: 100%; }
+    .action-row { left: 24px; bottom: 96px; }
+}
