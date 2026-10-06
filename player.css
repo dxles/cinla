@@ -259,6 +259,31 @@ input { font-family: inherit; }
     will-change: transform, opacity;
 }
 
+/* Liste tabanlı görünümler (Spotify / Apple Music / SoundCloud): daha geniş,
+   tam yükseklikte, üstten/alttan solan alan. Satır konumu JS ile ayarlanır. */
+.lyrics-container.lyrics-list-mode {
+    width: 480px;
+    max-width: 42vw;
+    padding: 0 32px 0 28px;
+    align-items: stretch;
+    text-align: left;
+}
+.lyrics-container.lyrics-list-mode #lyricsContent { height: 100%; }
+
+/* Hangi sağlayıcıdan geldiği (küçük, sönük) */
+.lyrics-source {
+    position: absolute;
+    right: 36px;
+    bottom: 112px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.38);
+    pointer-events: none;
+}
+.lyrics-source.hidden { display: none; }
+body.hud-hidden .lyrics-source { opacity: 0.6; }
+
 /* Düz (senkronsuz) sözler: zaman bilgisi olmadığı için tek satır
    halinde gösterilemiyor, akan/kaydırılabilir küçük bir liste olarak
    kalır. */

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nowtify Player</title>
   <link rel="stylesheet" href="player.css">
+  <link rel="stylesheet" href="lyrics-styles.css">
   <!-- GSAP Animasyon Kütüphanesi -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
@@ -47,6 +48,7 @@
   <div class="lyrics-container" id="lyricsContainerOuter">
     <div class="lyrics-status" id="lyricsStatus">Sözler yükleniyor...</div>
     <div id="lyricsContent"></div>
+    <div class="lyrics-source hidden" id="lyricsSource"></div>
   </div>
 
   <!-- YouTube Video Alanı: video her zaman burada, arka planda, tüm
@@ -115,6 +117,9 @@
 
   <!-- Ortak depolama/yardımcı fonksiyonlar -->
   <script src="common.js"></script>
+  <!-- Şarkı sözü sağlayıcıları (LRCLIB + Musixmatch) ve görünümleri -->
+  <script src="lyrics-providers.js"></script>
+  <script src="lyrics-styles.js"></script>
   <!-- YouTube Player Yükleyici Scripti -->
   <script src="youtube-player.js"></script>
   <!-- Ana JavaScript Dosyamız -->
